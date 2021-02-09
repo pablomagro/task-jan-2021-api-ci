@@ -7,13 +7,14 @@ install:
 - pip install --user awscli
 - pip install --user aws-sam-cli
 script:
-- sam --version
+# - sam --version
 - sam validate --template api-template-cf.yaml
 - sam package --template-file api-template-cf.yaml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-u7y9djooatel --output-template-file serverless-output.yaml
 - cat serverless-output.yaml
 deploy:
   provider: script
   script: sam deploy --template-file serverless-output.yaml --stack-name ElectricityPricesApi --capabilities CAPABILITY_IAM --parameter-overrides S3BucketUrl="https://quarterly-survey-of-domestic-electricity-prices.s3-ap-southeast-2.amazonaws.com/public/"
+  # scritp: /deploy-api.sh
   skip_cleanup: true
   on:
     branch: master

@@ -1,12 +1,13 @@
 {
-  "name": "hello_world",
+  "name": "get-survey-prices",
   "version": "1.0.0",
-  "description": "hello world sample for NodeJS",
+  "description": "get-survey-prices",
   "main": "app.js",
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
+    "http-status": "1.5.0"
   },
   "scripts": {
     "test": "mocha tests/unit/",
