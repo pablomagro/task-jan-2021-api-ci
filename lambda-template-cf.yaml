@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description:
+  Template for scheduling Lambda functions
+
+Globals:
+  Function:
+    Timeout: 120
+
+Parameters:
+  MbieURL:
+    Type: String
+    Description: MBIE URL address
+  LinkSearchURL:
+    Type: String
+    Description: MBIE Link search URL
+  S3BucketName:
+    Type: String
+    Description: S3 bucket name to store survey files
+
+  AlarmEmail:
+    Default: "pmagas.develop@gmail.com"
+    Description: "Email address to notify of operational issues"
+    Type: "String"
+
+Resources:
+  CronFunctionDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "quarter-qsdep-cronDL"
+      MessageRetentionPeriod: 1209600 # 14 days.
+
+  AlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        -
+          Endpoint:
+            Ref: "AlarmEmail"
+          Protocol: "email"
+  QueueDepthAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Alarm if queue depth increases to more than 1 messages"
+      Namespace: "AWS/SQS"
+      MetricName: "ApproximateNumberOfMessagesVisible"
+      Dimensions:
+        -
+          Name: "QueueName"
+          Value:
+            Fn::GetAtt:
+              - "CronFunctionDeadLetterQueue"
+              - "QueueName"
+      Statistic: "Sum"
+      Period: "300"
+      EvaluationPeriods: "1"
+      Threshold: "1"
+      ComparisonOperator: "GreaterThanThreshold"
+      AlarmActions:
+        -
+          Ref: "AlarmTopic"
+      InsufficientDataActions:
+        -
+          Ref: "AlarmTopic"
+
+  CronFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: quarter-qsdep-cron
+      Handler: app.lambdaHandler
+      Runtime: nodejs10.x
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn: 'arn:aws:sqs:ap-southeast-2:605313441167:quarter-qsdep-cronDL'
+      MemorySize: 2048
+      CodeUri: ./mbie-cron
+      Environment:
+        Variables:
+          MBIE_URL: !Ref MbieURL
+          SEARCH_URL: !Ref LinkSearchURL
+          S3_BUCKET_NAME: !Ref S3BucketName
+      Policies:
+        - AmazonS3FullAccess
+        - AmazonSQSFullAccess
+      Events:
+        StopScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 0 16 FEB,MAY,AUG,NOV ? *)
+      Layers:
+        - !Ref AppDependenciesLayer
+        # - 'arn:aws:lambda:ap-southeast-2:605313441167:layer:app-dependencies:4'
+
+  AppDependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+        LayerName: app-dependencies
+        Description: Dependencies for sam app
+        ContentUri: dependencies/
+        CompatibleRuntimes:
+          - nodejs10.x
+          - nodejs12.x
+        LicenseInfo: 'MIT'
+        RetentionPolicy: Retain
+
+Outputs:
+  QueueURL:
+    Description: "URL of new Amazon SQS Queue"
+    Value:
+      Ref: "CronFunctionDeadLetterQueue"
+  QueueARN:
+    Description: "ARN of new AmazonSQS Queue"
+    Value:
+      Fn::GetAtt:
+        - "CronFunctionDeadLetterQueue"
+        - "Arn"
+  QueueName:
+    Description: "Name of new Amazon SQS Queue"
+    Value:
+      Fn::GetAtt:
+        - "CronFunctionDeadLetterQueue"
+        - "QueueName"

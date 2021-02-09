@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "http-status": "1.5.0"
+  },
+  "scripts": {
+    "install:deps": "npm install"
+  }
+}

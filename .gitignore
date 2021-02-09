@@ -1,0 +1,6 @@
+node_modules/
+.aws-sam/
+.history/
+.vscode/
+out
+package-lock.json

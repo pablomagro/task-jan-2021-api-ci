@@ -1,0 +1,28 @@
+{
+  "name": "mbie-cron",
+  "version": "1.0.0",
+  "description": "Scheduled task for NodeJS",
+  "main": "app.js",
+  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "0.21.1",
+    "cheerio": "1.0.0-rc.5",
+    "chrome-aws-lambda": "^5.5.0",
+    "exceljs": "4.2.0",
+    "http-parser-js": "0.5.3",
+    "modern-random-ua": "1.0.3",
+    "puppeteer-core": "^7.0.1"
+  },
+  "scripts": {
+    "test": "mocha tests/unit/",
+    "integ-test": "mocha tests/integration/"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.815.0",
+    "chai": "^4.2.0",
+    "puppeteer": "^7.0.1",
+    "mocha": "^8.2.1"
+  }
+}

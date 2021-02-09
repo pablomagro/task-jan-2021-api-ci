@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "ElectricityPricesApi"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-u7y9djooatel"
+s3_prefix = "ElectricityPricesApi"
+region = "ap-southeast-2"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+profile = "pablo-developer"
+parameter_overrides = "S3BucketUrl=\"https://quarterly-survey-of-domestic-electricity-prices.s3-ap-southeast-2.amazonaws.com/public/\""

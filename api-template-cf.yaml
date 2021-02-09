@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  electricity-prices-api
+
+  SAM Template for ElectricityPricesApi
+
+Globals:
+  Function:
+    Timeout: 20
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
+      AllowCredentials: "'*'"
+Parameters:
+  S3BucketUrl:
+    Type: String
+    Description: S3 Bucket URL
+
+Resources:
+  GetSurveyPricesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: get-mbie-survey-prices
+      CodeUri: get-survey-prices/
+      Environment:
+        Variables:
+          S3_BUCKET_URL: !Ref S3BucketUrl
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        GetSuvey:
+          Type: Api
+          Properties:
+            Path: /mbie_survey_prices
+            Method: get
+      Policies:
+        - AmazonS3ReadOnlyAccess
+      Layers:
+        - 'arn:aws:lambda:ap-southeast-2:605313441167:layer:app-dependencies:4'
+
+Outputs:
+  ElectricityPricesApi:
+    Description: "API Gateway endpoint URL for Prod stage for Get Survey Prices function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/mbie_survey_prices/"
+  GetSurveyPricesFunction:
+    Description: "Get Survey Lambda Function ARN"
+    Value: !GetAtt GetSurveyPricesFunction.Arn
+  GetSurveyPricesFunctionIamRole:
+    Description: "Implicit IAM Role created for Get Survey function"
+    Value: !GetAtt GetSurveyPricesFunctionRole.Arn
