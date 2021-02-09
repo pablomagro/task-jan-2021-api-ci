@@ -10,11 +10,14 @@ install:
 - pip install --user aws-sam-cli
 script:
 - sam validate --template api-template-cf.yaml
-- sam build --template-file api-template-cf.yaml
+# - sam build --template-file api-template-cf.yaml
+- sam package --template-file api-template-cf.yaml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-u7y9djooatel --output-template-file serverless-output.yaml
 
 deploy:
   provider: script
   script: sam deploy --config-file sam-api-config.toml --stack-name ElectricityPricesApi
+  # script: sam deploy --template-file serverless-output.yaml --stack-name ElectricityPricesApi --capabilities CAPABILITY_IAM
+
   skip_cleanup: true
   on:
     branch: master
