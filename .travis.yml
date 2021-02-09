@@ -11,13 +11,11 @@ install:
 script:
 - sam --version
 - sam validate --template api-template-cf.yaml
-- sam build --template-file api-template-cf.yaml
-# - sam package --template-file api-template-cf.yaml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-u7y9djooatel --output-template-file serverless-output.yaml
+- sam package --template-file api-template-cf.yaml --s3-bucket aws-sam-cli-managed-default-samclisourcebucket-u7y9djooatel --output-template-file serverless-output.yaml
 - cat serverless-output.yaml
 
 deploy:
   provider: script
-  script: sam deploy --config-file sam-api-config.toml --stack-name ElectricityPricesApi
   # script: sam deploy --template-file serverless-output.yaml --stack-name ElectricityPricesApi --capabilities CAPABILITY_IAM --parameter-overrides S3BucketUrl=https://quarterly-survey-of-domestic-electricity-prices.s3-ap-southeast-2.amazonaws.com/public/
   script: sam deploy --template-file serverless-output.yaml --stack-name ElectricityPricesApi --capabilities CAPABILITY_IAM
 
