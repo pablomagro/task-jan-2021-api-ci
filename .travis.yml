@@ -1,0 +1,26 @@
+language: python
+python:
+  - '3'
+branches:
+  only: master
+install:
+  - pip install awscli
+  - pip install aws-sam-cli
+script:
+  - sam validate
+  - sam build --template-file api-template-cf.yaml
+
+deploy:
+  provider: script
+  script: sam deploy --config-file sam-api-config.toml --stack-name ElectricityPricesApi
+  skip_cleanup: true
+  on:
+    branch: master
+notifications:
+  email:
+    on_failure: always
+env:
+  global:
+  - AWS_DEFAULT_REGION=ap-southeast-2
+  - access_key_id: $AWS_ACCESS_KEY_ID
+  - secret_access_key: $AWS_SECRET_ACCESS_KEY
